@@ -4,6 +4,9 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+
+import com.avril.model.ChatMessage;
+
 import java.lang.reflect.Type;
 
 public class MySessionHandler extends StompSessionHandlerAdapter {
@@ -20,12 +23,12 @@ public class MySessionHandler extends StompSessionHandlerAdapter {
 
     @Override
     public Type getPayloadType(StompHeaders headers) {
-        return Greeting.class;
+        return ChatMessage.class;
     }
 
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
-        System.out.println("Received: " + ((Greeting) payload).getContent());
+        System.out.println("Received: " + ((ChatMessage) payload).getContent());
     }
     
 }

@@ -1,12 +1,17 @@
 package com.avril.demo;
 
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
+
+import com.avril.model.ChatMessage;
+import com.avril.model.ChatMessage.MessageType;
 
 public class SocketTest {
 //	public static void main(String[] args) {
@@ -38,8 +43,28 @@ public class SocketTest {
 		stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 		 
 		StompSessionHandler sessionHandler = new MySessionHandler();
-		stompClient.connect("ws://localhost:8080/", sessionHandler);
-		 
-		new Scanner(System.in).nextLine(); // Don't close immediately.
+		try {
+			StompSession sp = stompClient.connect("ws://localhost:8080/ws", sessionHandler).get();
+			ChatMessage chat = new ChatMessage();
+			chat.setType(MessageType.JOIN);
+			chat.setSender("jbaez");
+			sp.send("/app/chat.addUser", chat);
+			
+			String st = "";
+			do {
+				st = new Scanner(System.in).nextLine();			
+				chat.setType(MessageType.CHAT);
+				chat.setContent(st);
+				sp.send("/app/chat.sendMessage", chat);
+			}			
+			while(!"x".equals(st));
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 }
