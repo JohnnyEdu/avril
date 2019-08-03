@@ -14,6 +14,9 @@ public class ChatController {
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/public")
     public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
+    	if("hola".equalsIgnoreCase(chatMessage.getContent())) {
+    		chatMessage.setContent("Hola!, como estas?");
+    	}
         return chatMessage;
     }
 
